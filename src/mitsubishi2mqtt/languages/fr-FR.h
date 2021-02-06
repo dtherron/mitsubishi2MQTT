@@ -135,3 +135,10 @@ const char txt_upload_refresh[] PROGMEM = "Rafaichissement dans ";
 const char txt_init_title[] PROGMEM = "Initialisation";
 const char txt_init_reboot_mes[] PROGMEM = "Redémarrage et connexion à votre WIFI. L'appareil doit apparaitre dans votre réseau";
 const char txt_init_reboot[] PROGMEM = "Redémarrage...";
+
+//Page Footer
+const char txt_version[] PROGMEM = "version";
+const char txt_uptime[] PROGMEM = "Uptime";
+const char txt_days[] PROGMEM = "days";
+const char txt_hours[] PROGMEM = "hours";
+const char txt_minutes[] PROGMEM = "minutes";

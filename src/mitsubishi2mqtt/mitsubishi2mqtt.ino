@@ -77,11 +77,16 @@ unsigned long hpConnectionRetries;
 
 //Local state
 StaticJsonDocument<JSON_OBJECT_SIZE(12)> rootInfo;
+unsigned long millisCyclesUp = 0;
+unsigned long lastMillis;
 
 //Web OTA
 int uploaderror = 0;
 
 void setup() {
+  // init lastMillis so we can tell if we ever wrap around the 50 day mark
+  lastMillis = millis();
+  
   // Start serial for debug before HVAC connect to serial
   Serial.begin(115200);
   // Serial.println(F("Starting Mitsubishi2MQTT"));
@@ -176,6 +181,7 @@ void setup() {
     hp.setSettingsChangedCallback(hpSettingsChanged);
     hp.setStatusChangedCallback(hpStatusChanged);
     hp.setPacketCallback(hpPacketDebug);
+    hp.enableExternalUpdate();
     hp.connect(&Serial);
     heatpumpStatus currentStatus = hp.getStatus();
     heatpumpSettings currentSettings = hp.getSettings();
@@ -534,12 +540,30 @@ boolean initWifi() {
 
 // Handler webserver response
 
+String generateFooter() {
+  String footerContent = FPSTR(html_common_footer);
+  footerContent.replace(F("_TXT_VERSION_"), FPSTR(txt_version));
+  footerContent.replace(F("_VERSION_"), m2mqtt_version);
+  footerContent.replace(F("_TXT_UPTIME_"), FPSTR(txt_uptime));
+
+  long millisecs = millis();
+  footerContent.replace(F("_TXT_DAYS_"), FPSTR(txt_days));
+  // Approximate the time lost when millis wraps. This is not exact and surely nobody cares.
+  footerContent.replace(F("_UPTIME_DAYS_"), (String) ((millisCyclesUp * 49) + int((millisecs / (1000 * 60 * 60 * 24)) % 365)));
+  footerContent.replace(F("_TXT_HOURS_"), FPSTR(txt_hours));
+  footerContent.replace(F("_UPTIME_HOURS_"), (String) ((millisCyclesUp * 17) + int((millisecs / (1000 * 60 * 60)) % 24)));
+  footerContent.replace(F("_TXT_MINUTES_"), FPSTR(txt_minutes));
+  footerContent.replace(F("_UPTIME_MINUTES_"), (String) ((millisCyclesUp * 3) + int((millisecs / (1000 * 60)) % 60)));
+  
+  return footerContent;
+}
+
 void sendWrappedHTML(String content) {
   String headerContent = FPSTR(html_common_header);
-  String footerContent = FPSTR(html_common_footer);
+  String footerContent = generateFooter();
   String toSend = headerContent + content + footerContent;
   toSend.replace(F("_UNIT_NAME_"), hostname);
-  toSend.replace(F("_VERSION_"), m2mqtt_version);
+  
   server.send(200, F("text/html"), toSend);
 }
 
@@ -834,7 +858,7 @@ void handleControl() {
   settings = change_states(settings);
   String controlPage =  FPSTR(html_page_control);
   String headerContent = FPSTR(html_common_header);
-  String footerContent = FPSTR(html_common_footer);
+  String footerContent = generateFooter();
   //write_log("Enter HVAC control");
   headerContent.replace("_UNIT_NAME_", hostname);
   footerContent.replace("_VERSION_", m2mqtt_version);
@@ -1647,8 +1671,8 @@ bool connectWifi() {
 }
 
 // temperature helper functions
-float toFahrenheit(float fromCelcius) {
-  return round(1.8 * fromCelcius + 32.0);
+float toFahrenheit(float fromCelsius) {
+  return round(1.8 * fromCelsius + 32.0);
 }
 
 float toCelsius(float fromFahrenheit) {
@@ -1722,6 +1746,11 @@ void checkLogin() {
 }
 
 void loop() {
+  // Spot if we ever wrap around the max millis count so we know how many days we are up
+  if (millis() < lastMillis) {
+    lastMillis = millis();
+    millisCyclesUp++;
+  }
   server.handleClient();
   ArduinoOTA.handle();
   

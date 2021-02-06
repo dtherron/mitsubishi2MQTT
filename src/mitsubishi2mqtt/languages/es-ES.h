@@ -137,3 +137,10 @@ const char txt_upload_refresh[] PROGMEM = "Refescando en ";
 const char txt_init_title[] PROGMEM = "Configuración inicial";
 const char txt_init_reboot_mes[] PROGMEM = "Reiniciando y conectando a su red WiFi! Debería ver el equipo en su punto de acceso.";
 const char txt_init_reboot[] PROGMEM = "Reiniciando...";
+
+//Page Footer
+const char txt_version[] PROGMEM = "version";
+const char txt_uptime[] PROGMEM = "Uptime";
+const char txt_days[] PROGMEM = "days";
+const char txt_hours[] PROGMEM = "hours";
+const char txt_minutes[] PROGMEM = "minutes";

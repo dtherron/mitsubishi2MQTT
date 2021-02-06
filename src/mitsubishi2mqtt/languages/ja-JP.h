@@ -134,3 +134,10 @@ const char txt_upload_refresh[] PROGMEM = "再読込中";
 const char txt_init_title[] PROGMEM = "初期設定";
 const char txt_init_reboot_mes[] PROGMEM = "Rebooting and connecting to your WiFi network! You should see it listed in on your access point.";
 const char txt_init_reboot[] PROGMEM = "Rebooting...";
+
+//Page Footer
+const char txt_version[] PROGMEM = "version";
+const char txt_uptime[] PROGMEM = "Uptime";
+const char txt_days[] PROGMEM = "days";
+const char txt_hours[] PROGMEM = "hours";
+const char txt_minutes[] PROGMEM = "minutes";
