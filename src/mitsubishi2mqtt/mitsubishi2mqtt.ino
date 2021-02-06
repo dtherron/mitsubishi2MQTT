@@ -183,17 +183,8 @@ void setup() {
     hp.setPacketCallback(hpPacketDebug);
     hp.enableExternalUpdate();
     hp.connect(&Serial);
-    heatpumpStatus currentStatus = hp.getStatus();
-    heatpumpSettings currentSettings = hp.getSettings();
-    rootInfo["roomTemperature"]     = convertCelsiusToLocalUnit(currentStatus.roomTemperature, useFahrenheit);
-    rootInfo["temperature"]         = convertCelsiusToLocalUnit(currentSettings.temperature, useFahrenheit);
-    rootInfo["fan"]                 = currentSettings.fan;
-    rootInfo["vane"]                = currentSettings.vane;
-    rootInfo["wideVane"]            = currentSettings.wideVane;
-    rootInfo["mode"]                = hpGetMode(currentSettings.power, currentSettings.mode);
-    rootInfo["action"]              = hpGetAction(currentStatus.operating, currentSettings.power, currentSettings.mode);
-    rootInfo["compressorFrequency"] = currentStatus.compressorFrequency;
-    lastTempSend = millis();
+    hpSettingsChanged();
+    hpStatusChanged(hp.getStatus());
   }
   else {
     dnsServer.start(DNS_PORT, "*", apIP);
@@ -1246,6 +1237,7 @@ void hpSettingsChanged() {
 
   rootInfo.clear();
   rootInfo["temperature"]     = convertCelsiusToLocalUnit(currentSettings.temperature, useFahrenheit);
+  rootInfo["temperatureUnit"] = useFahrenheit ? "F" : "C";
   rootInfo["fan"]             = currentSettings.fan;
   rootInfo["vane"]            = currentSettings.vane;
   rootInfo["wideVane"]        = currentSettings.wideVane;
@@ -1368,7 +1360,7 @@ void hpSendLocalState() {
     if (_debugMode) mqtt_client.publish(ha_debug_topic.c_str(), (char*)("Failed to publish dummy hp status change"));
   }
 
-  // Restart counter for waiting enought time for the unit to update before sending a state packet
+  // Restart counter for waiting enough time for the unit to update before sending a state packet
   lastTempSend = millis();
 }
 
@@ -1756,9 +1748,9 @@ void loop() {
   
   //reset board to attempt to connect to wifi again if in ap mode or wifi dropped out and time limit passed
   if (WiFi.getMode() == WIFI_STA and WiFi.status() == WL_CONNECTED) {
-	  wifi_timeout = millis() + WIFI_RETRY_INTERVAL_MS;
+    wifi_timeout = millis() + WIFI_RETRY_INTERVAL_MS;
   } else if (wifi_config_exists and millis() > wifi_timeout) {
-	  ESP.restart();
+    ESP.restart();
   }
   
   if (!captive) {
@@ -1773,22 +1765,22 @@ void loop() {
         hp.sync();
     }
 
-	if (mqtt_config) {
-		//MQTT failed retry to connect
-		if (mqtt_client.state() < MQTT_CONNECTED)
-		{
-		  if ((millis() > (lastMqttRetry + MQTT_RETRY_INTERVAL_MS)) or lastMqttRetry == 0) {
-			mqttConnect();
-		  }
-		}
-		//MQTT config problem on MQTT do nothing
-		else if (mqtt_client.state() > MQTT_CONNECTED ) return;
-		//MQTT connected send status
-		else {
-		  hpStatusChanged(hp.getStatus());
-		  mqtt_client.loop();
-		}
-	}
+  if (mqtt_config) {
+    //MQTT failed retry to connect
+    if (mqtt_client.state() < MQTT_CONNECTED)
+    {
+      if ((millis() > (lastMqttRetry + MQTT_RETRY_INTERVAL_MS)) or lastMqttRetry == 0) {
+      mqttConnect();
+      }
+    }
+    //MQTT config problem on MQTT do nothing
+    else if (mqtt_client.state() > MQTT_CONNECTED ) return;
+    //MQTT connected send status
+    else {
+      hpStatusChanged(hp.getStatus());
+      mqtt_client.loop();
+    }
+  }
   }
   else {
     dnsServer.processNextRequest();
