@@ -101,3 +101,6 @@ const PROGMEM uint32_t HP_MAX_RETRIES = 5;
 bool useFahrenheit = false;
 // support heat mode settings, some model do not support heat mode
 bool supportHeatMode = true;
+
+// allow the device remote control to make changes
+bool allowExternalUpdate = false;

@@ -106,6 +106,7 @@ const char txt_unit_maxtemp[] PROGMEM = "Maximum temperature";
 const char txt_unit_mintemp[] PROGMEM = "Minimum temperature";
 const char txt_unit_steptemp[] PROGMEM = "Temperature step";
 const char txt_unit_modes[] PROGMEM = "Mode support";
+const char txt_unit_allow_external_update[] PROGMEM = "Allow updates from device's remote control";
 const char txt_unit_password[] PROGMEM = "Web password";
 
 //Page Login
