@@ -79,6 +79,8 @@ unsigned long hpConnectionRetries;
 StaticJsonDocument<JSON_OBJECT_SIZE(12)> rootInfo;
 unsigned long millisCyclesUp = 0;
 unsigned long lastMillis;
+unsigned long lastRemoteTemp;
+boolean usingRemoteTemp = false;
 
 //Web OTA
 int uploaderror = 0;
@@ -86,6 +88,7 @@ int uploaderror = 0;
 void setup() {
   // init lastMillis so we can tell if we ever wrap around the 50 day mark
   lastMillis = millis();
+  lastRemoteTemp = millis();
 
   // Start serial for debug before HVAC connect to serial
   Serial.begin(115200);
@@ -886,6 +889,7 @@ void handleControl() {
   controlPage.replace(F("_MAX_TEMP_"), String(convertCelsiusToLocalUnit(max_temp, useFahrenheit)));
   controlPage.replace(F("_TEMP_STEP_"), String(temp_step));
   controlPage.replace("_TXT_CTRL_CTEMP_", FPSTR(txt_ctrl_ctemp));
+  controlPage.replace("_TXT_CTRL_LOCAL_OR_REMOTE_", FPSTR(txt_ctrl_local_or_remote));
   controlPage.replace("_TXT_CTRL_TEMP_", FPSTR(txt_ctrl_temp));
   controlPage.replace("_TXT_CTRL_TITLE_", FPSTR(txt_ctrl_title));
   controlPage.replace("_TXT_CTRL_POWER_", FPSTR(txt_ctrl_power));
@@ -904,6 +908,12 @@ void handleControl() {
   controlPage.replace("_TXT_F_SPEED_", FPSTR(txt_f_speed));
   controlPage.replace("_TXT_F_SWING_", FPSTR(txt_f_swing));
   controlPage.replace("_TXT_F_POS_", FPSTR(txt_f_pos));
+
+  if (usingRemoteTemp) {
+    controlPage.replace("_TXT_F_LOCAL_OR_REMOTE_", FPSTR(txt_ctrl_remote));
+  } else {
+    controlPage.replace("_TXT_F_LOCAL_OR_REMOTE_", FPSTR(txt_ctrl_local));
+  }
 
   if (strcmp(settings.power, "ON") == 0) {
     controlPage.replace("_POWER_ON_", "selected");
@@ -1473,7 +1483,14 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
   }
   else if (strcmp(topic, ha_remote_temp_set_topic.c_str()) == 0) {
     float temperature = strtof(message, NULL);
-    hp.setRemoteTemperature(convertLocalUnitToCelsius(temperature, useFahrenheit));
+    if (temperature == 0) {
+      usingRemoteTemp = false;
+      hp.setRemoteTemperature(0);
+    } else {
+      hp.setRemoteTemperature(convertLocalUnitToCelsius(temperature, useFahrenheit));
+      usingRemoteTemp = true;
+    }
+    lastRemoteTemp = millis();
     hp.update();
   }
   else if (strcmp(topic, ha_debug_set_topic.c_str()) == 0) { //if the incoming message is on the heatpump_debug_set_topic topic...
@@ -1765,6 +1782,15 @@ void loop() {
     lastMillis = millis();
     millisCyclesUp++;
   }
+
+  // if we are currently using a remote temperature but it has not been updated
+  // for > 30 minutes, revert to the device in case a connection has been lost.
+  if (usingRemoteTemp && (unsigned long)(millis() - lastRemoteTemp) >= 1800000) {
+    hp.setRemoteTemperature(0); 
+    lastRemoteTemp = millis();
+    usingRemoteTemp = false;
+  }
+
   server.handleClient();
   ArduinoOTA.handle();
 

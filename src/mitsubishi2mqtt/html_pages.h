@@ -172,6 +172,7 @@ const char html_page_wifi[] PROGMEM =
 
 const char html_page_control[] PROGMEM =
 "<h2>_TXT_CTRL_CTEMP_ _ROOMTEMP_&#176;</h2>"
+"<h3>_TXT_CTRL_LOCAL_OR_REMOTE_ _TXT_F_LOCAL_OR_REMOTE_ </h3>"
 "<div id='l1' name='l1'>"
     "<fieldset>"
         "<legend><b>&nbsp; _TXT_CTRL_TITLE_ &nbsp;</b></legend>"

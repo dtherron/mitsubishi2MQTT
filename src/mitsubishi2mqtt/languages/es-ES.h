@@ -98,6 +98,9 @@ const char txt_ctrl_fan[] PROGMEM = "Ventilador";
 const char txt_ctrl_vane[] PROGMEM = "Aleta vertical";
 const char txt_ctrl_wvane[] PROGMEM = "Aleta horizontal";
 const char txt_ctrl_ctemp[] PROGMEM = "Temperatura actual";
+const char txt_ctrl_local_or_remote[] PROGMEM = "Temperature reading is";
+const char txt_ctrl_local[] PROGMEM = "local";
+const char txt_ctrl_remote[] PROGMEM = "remote";
 
 //Page Unit
 const char txt_unit_title[] PROGMEM = "Configuracion del aparato";

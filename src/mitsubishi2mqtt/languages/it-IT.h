@@ -98,6 +98,9 @@ const char txt_ctrl_fan[] PROGMEM = "Ventilazione";
 const char txt_ctrl_vane[] PROGMEM = "Oscillazione verticale";
 const char txt_ctrl_wvane[] PROGMEM = "Oscillazione orizzontale";
 const char txt_ctrl_ctemp[] PROGMEM = "Temperatura attuale";
+const char txt_ctrl_local_or_remote[] PROGMEM = "Temperature reading is";
+const char txt_ctrl_local[] PROGMEM = "local";
+const char txt_ctrl_remote[] PROGMEM = "remote";
 
 //Page Unit
 const char txt_unit_title[] PROGMEM = "Configurazione unità";

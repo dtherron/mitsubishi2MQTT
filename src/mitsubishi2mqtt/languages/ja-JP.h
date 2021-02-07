@@ -96,6 +96,9 @@ const char txt_ctrl_fan[] PROGMEM = "風量";
 const char txt_ctrl_vane[] PROGMEM = "上下風向";
 const char txt_ctrl_wvane[] PROGMEM = "左右風向";
 const char txt_ctrl_ctemp[] PROGMEM = "現在の室温";
+const char txt_ctrl_local_or_remote[] PROGMEM = "Temperature reading is";
+const char txt_ctrl_local[] PROGMEM = "local";
+const char txt_ctrl_remote[] PROGMEM = "remote";
 
 //Page Unit
 const char txt_unit_title[] PROGMEM = "エアコン本体設定";

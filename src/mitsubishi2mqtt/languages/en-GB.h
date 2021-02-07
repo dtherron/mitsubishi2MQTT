@@ -98,6 +98,9 @@ const char txt_ctrl_fan[] PROGMEM = "Fan";
 const char txt_ctrl_vane[] PROGMEM = "Vane";
 const char txt_ctrl_wvane[] PROGMEM = "Wide Vane";
 const char txt_ctrl_ctemp[] PROGMEM = "Current temperature";
+const char txt_ctrl_local_or_remote[] PROGMEM = "Temperature reading is";
+const char txt_ctrl_local[] PROGMEM = "local";
+const char txt_ctrl_remote[] PROGMEM = "remote";
 
 //Page Unit
 const char txt_unit_title[] PROGMEM = "Unit configuration";

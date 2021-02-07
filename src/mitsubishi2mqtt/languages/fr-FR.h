@@ -97,6 +97,9 @@ const char txt_ctrl_fan[] PROGMEM = "Ventilateur";
 const char txt_ctrl_vane[] PROGMEM = "Ailettes";
 const char txt_ctrl_wvane[] PROGMEM = "Ailettes horizontale";
 const char txt_ctrl_ctemp[] PROGMEM = "Température en cours";
+const char txt_ctrl_local_or_remote[] PROGMEM = "Temperature reading is";
+const char txt_ctrl_local[] PROGMEM = "local";
+const char txt_ctrl_remote[] PROGMEM = "remote";
 
 //Page Unit
 const char txt_unit_title[] PROGMEM = "Climatiseur configuration";
