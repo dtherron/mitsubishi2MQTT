@@ -1268,11 +1268,12 @@ void hpSettingsChanged() {
   heatpumpSettings currentSettings = hp.getSettings();
 
   rootInfo.clear();
-  rootInfo["temperature"]     = convertCelsiusToLocalUnit(currentSettings.temperature, useFahrenheit);
-  rootInfo["temperatureUnit"] = useFahrenheit ? "F" : "C";
-  rootInfo["fan"]             = currentSettings.fan;
-  rootInfo["vane"]            = currentSettings.vane;
-  rootInfo["wideVane"]        = currentSettings.wideVane;
+  rootInfo["temperature"]       = convertCelsiusToLocalUnit(currentSettings.temperature, useFahrenheit);
+  rootInfo["temperatureUnit"]   = useFahrenheit ? "F" : "C";
+  rootInfo["temperatureSource"] = usingRemoteTemp ? "remote" : "local";
+  rootInfo["fan"]               = currentSettings.fan;
+  rootInfo["vane"]              = currentSettings.vane;
+  rootInfo["wideVane"]          = currentSettings.wideVane;
 
   String hppower = String(currentSettings.power);
   String hpmode = String(currentSettings.mode);
@@ -1784,8 +1785,8 @@ void loop() {
   }
 
   // if we are currently using a remote temperature but it has not been updated
-  // for > 30 minutes, revert to the device in case a connection has been lost.
-  if (usingRemoteTemp && (unsigned long)(millis() - lastRemoteTemp) >= 1800000) {
+  // for > 45 minutes, revert to the device in case a connection has been lost.
+  if (usingRemoteTemp && (unsigned long)(millis() - lastRemoteTemp) >= 2700000) {
     hp.setRemoteTemperature(0); 
     lastRemoteTemp = millis();
     usingRemoteTemp = false;
