@@ -1270,7 +1270,6 @@ void hpSettingsChanged() {
   rootInfo.clear();
   rootInfo["temperature"]       = convertCelsiusToLocalUnit(currentSettings.temperature, useFahrenheit);
   rootInfo["temperatureUnit"]   = useFahrenheit ? "F" : "C";
-  rootInfo["temperatureSource"] = usingRemoteTemp ? "remote" : "local";
   rootInfo["fan"]               = currentSettings.fan;
   rootInfo["vane"]              = currentSettings.vane;
   rootInfo["wideVane"]          = currentSettings.wideVane;
@@ -1344,6 +1343,7 @@ void hpStatusChanged(heatpumpStatus currentStatus) {
     rootInfo.clear();
     rootInfo["roomTemperature"]     = convertCelsiusToLocalUnit(currentStatus.roomTemperature, useFahrenheit);
     rootInfo["temperature"]         = convertCelsiusToLocalUnit(currentSettings.temperature, useFahrenheit);
+    rootInfo["temperatureSource"]   = usingRemoteTemp ? "remote" : "local";
     rootInfo["fan"]                 = currentSettings.fan;
     rootInfo["vane"]                = currentSettings.vane;
     rootInfo["wideVane"]            = currentSettings.wideVane;
