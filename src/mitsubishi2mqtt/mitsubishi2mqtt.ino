@@ -76,7 +76,7 @@ unsigned long lastHpSync;
 unsigned long hpConnectionRetries;
 
 //Local state
-StaticJsonDocument<JSON_OBJECT_SIZE(12)> rootInfo;
+StaticJsonDocument < JSON_OBJECT_SIZE(15) + 100 > rootInfo;
 unsigned long millisCyclesUp = 0;
 unsigned long lastMillis;
 unsigned long lastRemoteTemp;
@@ -1399,6 +1399,7 @@ void hpSendLocalState() {
 
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
 
+  rootInfo.clear();
   // Copy payload into message buffer
   char message[length + 1];
   for (unsigned int i = 0; i < length; i++) {
@@ -1454,8 +1455,11 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
   else if (strcmp(topic, ha_temp_set_topic.c_str()) == 0) {
     float temperature = strtof(message, NULL);
     float temperature_c = convertLocalUnitToCelsius(temperature, useFahrenheit);
-    if (temperature_c < min_temp || temperature_c > max_temp) {
-      temperature_c = 23;
+    if (temperature_c < min_temp) {
+      temperature_c = min_temp;
+      rootInfo["temperature"] = convertCelsiusToLocalUnit(temperature_c, useFahrenheit);
+    } else if (temperature_c > max_temp) {
+      temperature_c = max_temp;
       rootInfo["temperature"] = convertCelsiusToLocalUnit(temperature_c, useFahrenheit);
     } else {
       rootInfo["temperature"] = temperature;
@@ -1787,7 +1791,7 @@ void loop() {
   // if we are currently using a remote temperature but it has not been updated
   // for > 45 minutes, revert to the device in case a connection has been lost.
   if (usingRemoteTemp && (unsigned long)(millis() - lastRemoteTemp) >= 2700000) {
-    hp.setRemoteTemperature(0); 
+    hp.setRemoteTemperature(0);
     lastRemoteTemp = millis();
     usingRemoteTemp = false;
   }
